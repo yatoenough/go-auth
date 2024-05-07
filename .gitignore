@@ -1,0 +1,7 @@
+# Binary files
+bin/
+
+# Test binaries (build with 'go test -c')
+*.test
+
+.env
