@@ -2,7 +2,7 @@ package main
 
 import (
 	"go-auth/config"
-	"go-auth/internal/database"
+	"go-auth/internal/database/mongodb"
 	"go-auth/internal/routes"
 	"log"
 
@@ -12,13 +12,13 @@ import (
 func main() {
 	config.LoadConfig()
 
-	err := database.Init(config.DatabaseURL, config.DatabaseName)
+	err := mongodb.Init(config.DatabaseURL, config.DatabaseName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer func() {
-		err := database.Close()
+		err := mongodb.Close()
 		if err != nil {
 			log.Fatal(err)
 		}

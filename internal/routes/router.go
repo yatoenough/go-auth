@@ -8,13 +8,13 @@ import (
 
 var router = gin.Default()
 
-// Run will start the server
 func Run(port int) {
-	getRoutes()
+	registerRoutes()
 	router.Run(fmt.Sprintf(":%d", port))
 }
 
-func getRoutes() {
+func registerRoutes() {
 	v1 := router.Group("/api/v1")
+	// authenticated := v1.Group("/authenticated")
 	addUsersRoutes(v1)
 }

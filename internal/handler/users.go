@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"go-auth/internal/database"
+	"go-auth/internal/database/mongodb"
 	"go-auth/internal/model"
 	"net/http"
 
@@ -19,7 +19,7 @@ func CreateUser(c *gin.Context) {
 
 	user := model.NewUser(body)
 
-	_, err := database.Users.InsertOne(c, user)
+	_, err := mongodb.Users.InsertOne(c, user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to create user"})
 		return
@@ -29,7 +29,7 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetUsers(c *gin.Context) {
-	cursor, err := database.Users.Find(c, bson.M{})
+	cursor, err := mongodb.Users.Find(c, bson.M{})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to fetch users"})
 		return
@@ -52,7 +52,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	result := database.Users.FindOne(c, primitive.M{"_id": _id})
+	result := mongodb.Users.FindOne(c, primitive.M{"_id": _id})
 	user := model.User{}
 	err = result.Decode(&user)
 	if err != nil {
@@ -73,7 +73,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	res, _ := database.Users.DeleteOne(c, bson.M{"_id": _id})
+	res, _ := mongodb.Users.DeleteOne(c, bson.M{"_id": _id})
 
 	if res.DeletedCount == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found."})
