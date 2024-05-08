@@ -8,16 +8,17 @@ import (
 
 func SendMail(receiver, activationCode string) {
 	//get env variables
-	senderMail := os.Getenv("MAILER_SENDER_MAIL")
-	appPassword := os.Getenv("MAILER_APP_PASSWORD")
-	smtpHost := os.Getenv("MAILER_SMTP_HOST")
-	smtpPort := os.Getenv("MAILER_SMTP_PORT")
+	apiHost := os.Getenv("API_HOST")
+	senderMail := os.Getenv("SENDER_MAIL")
+	appPassword := os.Getenv("APP_PASSWORD")
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT")
 
 	//connect to SMTP
 	auth := smtp.PlainAuth("", senderMail, appPassword, smtpHost)
 	to := []string{receiver}
 
-	activationLink := os.Getenv("API_HOST") + "/api/v1/users/activate/" + activationCode
+	activationLink := apiHost + "/api/v1/users/activate/" + activationCode
 
 	//define message context
 	msg := []byte(fmt.Sprintf("To: %s\r\n"+

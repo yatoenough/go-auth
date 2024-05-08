@@ -12,10 +12,10 @@ import (
 
 func ActivateUser(c *gin.Context) {
 	//parse link from param and convert to URL
-	link := c.Param("link")
+	code := c.Param("code")
 
 	//fetch user by id and decode document
-	result := mongodb.Users.FindOne(c, primitive.M{"activationLink": link})
+	result := mongodb.Users.FindOne(c, primitive.M{"activationCode": code})
 	user := model.User{}
 	err := result.Decode(&user)
 	if err != nil {
@@ -24,7 +24,7 @@ func ActivateUser(c *gin.Context) {
 	}
 
 	//update isActivated field to true
-	_, err = mongodb.Users.UpdateOne(c, bson.M{"activationLink": link}, bson.M{"$set": bson.M{"isActivated": true}})
+	_, err = mongodb.Users.UpdateOne(c, bson.M{"activationCode": code}, bson.M{"$set": bson.M{"isActivated": true}})
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user cant be activated."})
 		return

@@ -16,5 +16,5 @@ func addUsersRoutes(rg *gin.RouterGroup) {
 	usersGroup.GET("/:id", users.GetUserById)
 	usersGroup.PATCH("/:id", users.UpdateUser)
 	usersGroup.DELETE("/:id", users.DeleteUser)
-	usersGroup.GET("/activate/:link", users.ActivateUser)
+	usersGroup.GET("/activate/:code", users.ActivateUser)
 }
