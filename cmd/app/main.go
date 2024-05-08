@@ -2,22 +2,24 @@ package main
 
 import (
 	"cruddemo/internal/database"
-	"fmt"
+	"cruddemo/internal/routes"
 	"log"
 	"os"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
-	err := database.Init(os.Getenv("DB_URL"))
+    connectionString := os.Getenv("DB_URL")
+	dbName := os.Getenv("DB_NAME")
+
+	err := database.Init(connectionString, dbName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer func(){
+	defer func() {
 		err := database.CLose()
 		if err != nil {
 			log.Fatal(err)
@@ -25,7 +27,5 @@ func main() {
 	}()
 
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-
-	r := gin.Default()
-	r.Run(fmt.Sprintf(":%d", port))
+	routes.Run(port)
 }

@@ -8,23 +8,26 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var client *mongo.Client
+var (
+	client *mongo.Client
+	Users  *mongo.Collection
+)
 
-func Init(connectionString string) error {
-  serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-  opts := options.Client().ApplyURI(connectionString).SetServerAPIOptions(serverAPI)
+func Init(connectionString, dbName string) error {
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI(connectionString).SetServerAPIOptions(serverAPI)
 
-  localClient, err := mongo.Connect(context.Background(), opts)
-  if err != nil {
-    return err
-  }
-  
-  client = localClient
+	client, err := mongo.Connect(context.Background(), opts)
+	if err != nil {
+		return err
+	}
 
-  err = client.Database("main").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Err()
-  return err
+	Users = client.Database(dbName).Collection("Users")
+
+	err = client.Database("main").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Err()
+	return err
 }
 
-func CLose() error{
-    return client.Disconnect(context.Background())
+func CLose() error {
+	return client.Disconnect(context.Background())
 }
