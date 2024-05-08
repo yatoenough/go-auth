@@ -12,11 +12,13 @@ import (
 func main() {
 	config.LoadConfig()
 
-	err := mongodb.Init(config.DatabaseURL, config.DatabaseName)
+	//init db
+	err := mongodb.Init(config.GetDatabaseURL(), config.GetDatabaseName())
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	//close connection to db after app stops
 	defer func() {
 		err := mongodb.Close()
 		if err != nil {
@@ -24,5 +26,6 @@ func main() {
 		}
 	}()
 
-	routes.Run(config.Port)
+	//start app
+	routes.Run(config.GetPort())
 }

@@ -1,17 +1,19 @@
 package routes
 
 import (
-	"go-auth/internal/handler"
+	"go-auth/internal/handler/users"
 
 	"github.com/gin-gonic/gin"
 )
 
 func addUsersRoutes(rg *gin.RouterGroup) {
-	users := rg.Group("/users")
+	//define route group
+	usersGroup := rg.Group("/users")
 
-	users.POST("/", handler.CreateUser)
-	users.GET("/", handler.GetUsers)
-	users.GET("/:id", handler.GetUserById)
-	users.PATCH("/:id", handler.UpdateUser)
-	users.DELETE("/:id", handler.DeleteUser)
+	//bind methods
+	usersGroup.POST("/", users.CreateUser)
+	usersGroup.GET("/", users.GetUsers)
+	usersGroup.GET("/:id", users.GetUserById)
+	usersGroup.PATCH("/:id", users.UpdateUser)
+	usersGroup.DELETE("/:id", users.DeleteUser)
 }

@@ -1,7 +1,13 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go-auth/config"
+	"go-auth/internal/common/utils"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+// define user model
 type User struct {
 	Id             primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Email          string             `bson:"email" json:"email"`
@@ -15,13 +21,14 @@ type CreateUserRequest struct {
 	Password string `bson:"password" json:"password"`
 }
 
+// method to create user entity
 func NewUser(body CreateUserRequest) User {
 	user := User{
 		Id:             primitive.NewObjectID(),
 		Email:          body.Email,
 		Password:       body.Password,
 		IsActivated:    false,
-		ActivationLink: "test",
+		ActivationLink: config.GetApiHost() + "/activate/" + utils.GenerateRandomString(10),
 	}
 	return user
 }

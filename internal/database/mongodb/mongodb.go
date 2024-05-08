@@ -14,6 +14,7 @@ var (
 )
 
 func Init(connectionString, dbName string) error {
+	//connect to database
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(connectionString).SetServerAPIOptions(serverAPI)
 
@@ -22,12 +23,15 @@ func Init(connectionString, dbName string) error {
 		return err
 	}
 
+	//create users collection
 	Users = client.Database(dbName).Collection("Users")
 
+	//check database connection
 	err = client.Database("main").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Err()
 	return err
 }
 
 func Close() error {
+	//close database connection
 	return client.Disconnect(context.Background())
 }
