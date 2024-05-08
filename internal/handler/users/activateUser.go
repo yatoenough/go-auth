@@ -1,7 +1,6 @@
-package handler
+package users
 
 import (
-	"go-auth/config"
 	"go-auth/internal/database/mongodb"
 	"go-auth/internal/model"
 	"net/http"
@@ -11,9 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func Activate(c *gin.Context) {
+func ActivateUser(c *gin.Context) {
 	//parse link from param and convert to URL
-	link := config.GetApiHost() + "/activate/" + c.Param("link")
+	link := c.Param("link")
 
 	//fetch user by id and decode document
 	result := mongodb.Users.FindOne(c, primitive.M{"activationLink": link})

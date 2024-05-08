@@ -2,7 +2,6 @@ package routes
 
 import (
 	"fmt"
-	"go-auth/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,15 +9,12 @@ import (
 // init router
 var router = gin.Default()
 
-func Run(port int) {
+func Run(port string) {
 	registerRoutes()
-	router.Run(fmt.Sprintf(":%d", port))
+	router.Run(fmt.Sprintf(":%s", port))
 }
 
 func registerRoutes() {
-	//define route for account activation
-	router.GET("/activate/:link", handler.Activate)
-
 	//define root route group
 	v1 := router.Group("/api/v1")
 	addUsersRoutes(v1)

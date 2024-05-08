@@ -5,6 +5,7 @@ import (
 	"go-auth/internal/database/mongodb"
 	"go-auth/internal/routes"
 	"log"
+	"os"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -13,7 +14,7 @@ func main() {
 	config.LoadConfig()
 
 	//init db
-	err := mongodb.Init(config.GetDatabaseURL(), config.GetDatabaseName())
+	err := mongodb.Init(os.Getenv("DB_URL"), os.Getenv("DB_NAME"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,5 +28,5 @@ func main() {
 	}()
 
 	//start app
-	routes.Run(config.GetPort())
+	routes.Run(os.Getenv("PORT"))
 }

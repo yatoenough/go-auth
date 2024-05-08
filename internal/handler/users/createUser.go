@@ -28,7 +28,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	//send activation link to email
-	utils.SendMail(user.Email, user.ActivationLink)
+	utils.SendMail(user.Email, user.ActivationCode)
 
 	//send res
 	c.JSON(http.StatusCreated, user)

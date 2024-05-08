@@ -1,7 +1,6 @@
 package model
 
 import (
-	"go-auth/config"
 	"go-auth/internal/common/utils"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,7 +12,7 @@ type User struct {
 	Email          string             `bson:"email" json:"email"`
 	Password       string             `bson:"password" json:"password"`
 	IsActivated    bool               `bson:"isActivated" json:"isActivated"`
-	ActivationLink string             `bson:"activationLink" json:"activationLink"`
+	ActivationCode string             `bson:"activationCode" json:"activationCode"`
 }
 
 type CreateUserRequest struct {
@@ -28,7 +27,7 @@ func NewUser(body CreateUserRequest) User {
 		Email:          body.Email,
 		Password:       body.Password,
 		IsActivated:    false,
-		ActivationLink: config.GetApiHost() + "/activate/" + utils.GenerateRandomString(10),
+		ActivationCode: utils.GenerateRandomString(10),
 	}
 	return user
 }
