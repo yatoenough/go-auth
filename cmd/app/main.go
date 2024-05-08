@@ -18,7 +18,7 @@ func main() {
 	}
 
 	defer func() {
-		err := database.CLose()
+		err := database.Close()
 		if err != nil {
 			log.Fatal(err)
 		}

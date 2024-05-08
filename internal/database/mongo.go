@@ -28,6 +28,6 @@ func Init(connectionString, dbName string) error {
 	return err
 }
 
-func CLose() error {
+func Close() error {
 	return client.Disconnect(context.Background())
 }
