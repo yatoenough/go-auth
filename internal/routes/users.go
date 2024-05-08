@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"cruddemo/internal/handler"
+	"go-auth/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )

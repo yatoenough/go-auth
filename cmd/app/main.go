@@ -1,20 +1,18 @@
 package main
 
 import (
-	"cruddemo/internal/database"
-	"cruddemo/internal/routes"
+	"go-auth/config"
+	"go-auth/internal/database"
+	"go-auth/internal/routes"
 	"log"
-	"os"
-	"strconv"
 
 	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
-    connectionString := os.Getenv("DB_URL")
-	dbName := os.Getenv("DB_NAME")
+	config.LoadConfig()
 
-	err := database.Init(connectionString, dbName)
+	err := database.Init(config.DatabaseURL, config.DatabaseName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -26,6 +24,5 @@ func main() {
 		}
 	}()
 
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	routes.Run(port)
+	routes.Run(config.Port)
 }

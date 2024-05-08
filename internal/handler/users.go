@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"cruddemo/internal/database"
-	"cruddemo/internal/model"
+	"go-auth/internal/database"
+	"go-auth/internal/model"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
