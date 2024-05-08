@@ -1,6 +1,7 @@
 package users
 
 import (
+	"go-auth/internal/common/res"
 	"go-auth/internal/database/mongodb"
 	"go-auth/internal/model"
 	"net/http"
@@ -19,17 +20,17 @@ func ActivateUser(c *gin.Context) {
 	user := model.User{}
 	err := result.Decode(&user)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found."})
+		res.NewMessageResponse(c, http.StatusNotFound, "User not found.")
 		return
 	}
 
 	//update isActivated field to true
 	_, err = mongodb.Users.UpdateOne(c, bson.M{"activationCode": code}, bson.M{"$set": bson.M{"isActivated": true}})
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user cant be activated."})
+		res.NewMessageResponse(c, http.StatusNotFound, "User can't be activated.")
 		return
 	}
 
 	//send res
-	c.JSON(http.StatusOK, gin.H{"message": "user activated."})
+	res.NewMessageResponse(c, http.StatusOK, "User activated successfully!")
 }

@@ -1,6 +1,7 @@
 package users
 
 import (
+	"go-auth/internal/common/res"
 	"go-auth/internal/database/mongodb"
 	"net/http"
 
@@ -14,19 +15,19 @@ func DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		res.NewMessageResponse(c, http.StatusBadRequest, "Invalid ID provided.")
 		return
 	}
 
 	//delete user
-	res, _ := mongodb.Users.DeleteOne(c, bson.M{"_id": _id})
+	result, _ := mongodb.Users.DeleteOne(c, bson.M{"_id": _id})
 
 	//check if user was deleted
-	if res.DeletedCount == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found."})
+	if result.DeletedCount == 0 {
+		res.NewMessageResponse(c, http.StatusNotFound, "User with ID `"+id+"` not found.")
 		return
 	}
 
 	//send res
-	c.JSON(http.StatusOK, gin.H{"message": "deleted successfully"})
+	res.NewMessageResponse(c, http.StatusOK, "Deleted successfully!")
 }

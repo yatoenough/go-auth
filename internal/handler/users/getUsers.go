@@ -1,6 +1,7 @@
 package users
 
 import (
+	"go-auth/internal/common/res"
 	"go-auth/internal/database/mongodb"
 	"go-auth/internal/model"
 	"net/http"
@@ -13,17 +14,17 @@ func GetUsers(c *gin.Context) {
 	//fetch users from mongodb
 	cursor, err := mongodb.Users.Find(c, bson.M{})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to fetch users"})
+		res.NewMessageResponse(c, http.StatusInternalServerError, "Unable to fetch users.")
 		return
 	}
 
 	//decode all documents into result
 	var users []model.User
 	if err = cursor.All(c, &users); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to fetch users"})
+		res.NewMessageResponse(c, http.StatusInternalServerError, "Unable to fetch users.")
 		return
 	}
 
 	//send res
-	c.JSON(http.StatusOK, users)
+	res.NewBodyResponse(c, http.StatusOK, users)
 }

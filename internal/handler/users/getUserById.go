@@ -1,6 +1,7 @@
 package users
 
 import (
+	"go-auth/internal/common/res"
 	"go-auth/internal/database/mongodb"
 	"go-auth/internal/model"
 	"net/http"
@@ -14,7 +15,7 @@ func GetUserById(c *gin.Context) {
 	id := c.Param("id")
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		res.NewMessageResponse(c, http.StatusBadRequest, "Invalid ID provided.")
 		return
 	}
 
@@ -23,10 +24,10 @@ func GetUserById(c *gin.Context) {
 	user := model.User{}
 	err = result.Decode(&user)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found."})
+		res.NewMessageResponse(c, http.StatusNotFound, "User with ID `"+id+"` not found.")
 		return
 	}
 
 	//send res
-	c.JSON(http.StatusOK, user)
+	res.NewBodyResponse(c, http.StatusOK, user)
 }
