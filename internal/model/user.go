@@ -2,6 +2,7 @@ package model
 
 import (
 	"go-auth/internal/common/utils"
+	"go-auth/internal/model/dto"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -10,18 +11,12 @@ import (
 type User struct {
 	Id             primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Email          string             `bson:"email" json:"email"`
-	Password       string             `bson:"password" json:"password"`
+	Password       string             `bson:"password" json:"-"`
 	IsActivated    bool               `bson:"isActivated" json:"isActivated"`
 	ActivationCode string             `bson:"activationCode" json:"activationCode"`
 }
 
-type CreateUserRequest struct {
-	Email    string `bson:"email" json:"email"`
-	Password string `bson:"password" json:"password"`
-}
-
-// method to create user entity
-func NewUser(body CreateUserRequest) User {
+func NewUser(body *dto.CreateUserRequest) User {
 	user := User{
 		Id:             primitive.NewObjectID(),
 		Email:          body.Email,

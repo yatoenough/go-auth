@@ -3,7 +3,8 @@ package main
 import (
 	"go-auth/config"
 	"go-auth/internal/database/mongodb"
-	"go-auth/internal/routes"
+	"go-auth/internal/injector"
+	"go-auth/internal/router"
 	"log"
 	"os"
 
@@ -13,13 +14,13 @@ import (
 func main() {
 	config.LoadConfig()
 
-	//init db
 	err := mongodb.Init(os.Getenv("DB_URL"), os.Getenv("DB_NAME"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//close connection to db after app stops
+	injector.Init()
+
 	defer func() {
 		err := mongodb.Close()
 		if err != nil {
@@ -27,6 +28,5 @@ func main() {
 		}
 	}()
 
-	//start app
-	routes.Run(os.Getenv("PORT"))
+	router.Run(os.Getenv("PORT"))
 }

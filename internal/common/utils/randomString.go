@@ -8,7 +8,6 @@ import (
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func GenerateRandomString(length int) string {
-	//generate new pseudorandom seed
 	source := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(source)
 
