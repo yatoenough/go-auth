@@ -17,6 +17,7 @@ type UserService interface {
 	ActivateUser(code *string) error
 	GetUserById(*string) (*model.User, error)
 	GetUserByCode(*string) (*model.User, error)
+	GetUserByEmail(*string) (*model.User, error)
 	GetAll() ([]model.User, error)
 	UpdateUser(*model.User) error
 	DeleteUser(*string) error
@@ -36,11 +37,13 @@ func NewUserService(userCollection *mongo.Collection, ctx context.Context) UserS
 
 func (u *UserServiceImpl) CreateUser(body *dto.CreateUserRequest) (*model.User, error) {
 	user := model.NewUser(body)
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return &model.User{}, err
 	}
 	user.Password = string(hash)
+
 	_, err = u.userCollection.InsertOne(u.ctx, user)
 	return &user, err
 }
@@ -56,6 +59,13 @@ func (u *UserServiceImpl) GetUserById(id *string) (*model.User, error) {
 func (u *UserServiceImpl) GetUserByCode(code *string) (*model.User, error) {
 	var user *model.User
 	query := bson.D{bson.E{Key: "activationCode", Value: code}}
+	err := u.userCollection.FindOne(u.ctx, query).Decode(&user)
+	return user, err
+}
+
+func (u *UserServiceImpl) GetUserByEmail(email *string) (*model.User, error) {
+	var user *model.User
+	query := bson.D{bson.E{Key: "email", Value: email}}
 	err := u.userCollection.FindOne(u.ctx, query).Decode(&user)
 	return user, err
 }
