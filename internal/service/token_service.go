@@ -8,24 +8,22 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = []byte("secret-key")
-
 type TokenService interface {
 	CreateToken(model.User) (string, error)
 	VerifyToken(tokenString string) (*jwt.Token, error)
 }
 
-type TokenServiceImpl struct {
+type tokenServiceImpl struct {
 	secretKey []byte
 }
 
 func NewTokenService(secret string) TokenService {
-	return &TokenServiceImpl{
+	return &tokenServiceImpl{
 		secretKey: []byte(secret),
 	}
 }
 
-func (ts *TokenServiceImpl) CreateToken(user model.User) (string, error) {
+func (ts *tokenServiceImpl) CreateToken(user model.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"sub":   user.Id,
@@ -33,7 +31,7 @@ func (ts *TokenServiceImpl) CreateToken(user model.User) (string, error) {
 			"exp":   time.Now().Add(time.Hour * 2).Unix(),
 		})
 
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString(ts.secretKey)
 	if err != nil {
 		return "", err
 	}
@@ -41,9 +39,9 @@ func (ts *TokenServiceImpl) CreateToken(user model.User) (string, error) {
 	return tokenString, nil
 }
 
-func (ts *TokenServiceImpl) VerifyToken(tokenString string) (*jwt.Token, error) {
+func (ts *tokenServiceImpl) VerifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return secretKey, nil
+		return ts.secretKey, nil
 	})
 
 	if err != nil {

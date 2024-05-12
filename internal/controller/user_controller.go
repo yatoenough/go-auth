@@ -9,25 +9,25 @@ import (
 )
 
 type UserController struct {
-	UserService service.UserService
+	userService service.UserService
 }
 
 func NewUserController(userService service.UserService) UserController {
 	return UserController{
-		UserService: userService,
+		userService: userService,
 	}
 }
 
 func (uc *UserController) ActivateUser(c *gin.Context) {
 	code := c.Param("code")
 
-	user, err := uc.UserService.GetUserByCode(&code)
+	user, err := uc.userService.GetUserByCode(&code)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusNotFound, "User not found.")
 		return
 	}
 
-	err = uc.UserService.ActivateUser(&user.ActivationCode)
+	err = uc.userService.ActivateUser(&user.ActivationCode)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "Unable to activate user.")
 		return
@@ -39,7 +39,7 @@ func (uc *UserController) ActivateUser(c *gin.Context) {
 
 func (uc *UserController) GetUserById(c *gin.Context) {
 	id := c.Param("id")
-	user, err := uc.UserService.GetUserById((&id))
+	user, err := uc.userService.GetUserById((&id))
 	if err != nil {
 		dto.ApiResponse(c, http.StatusNotFound, "User not found.")
 		return
@@ -48,7 +48,7 @@ func (uc *UserController) GetUserById(c *gin.Context) {
 }
 
 func (uc *UserController) GetAll(c *gin.Context) {
-	users, err := uc.UserService.GetAll()
+	users, err := uc.userService.GetAll()
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "Unable to fetch users.")
 		return
@@ -63,7 +63,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 
 func (uc *UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	err := uc.UserService.DeleteUser(&id)
+	err := uc.userService.DeleteUser(&id)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "User not found.")
 		return

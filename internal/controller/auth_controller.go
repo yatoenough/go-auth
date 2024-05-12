@@ -11,14 +11,14 @@ import (
 )
 
 type AuthController struct {
-	UserService  service.UserService
-	TokenService service.TokenService
+	userService  service.UserService
+	tokenService service.TokenService
 }
 
 func NewAuthController(userService service.UserService, tokenService service.TokenService) AuthController {
 	return AuthController{
-		UserService:  userService,
-		TokenService: tokenService,
+		userService:  userService,
+		tokenService: tokenService,
 	}
 }
 
@@ -29,13 +29,13 @@ func (ac *AuthController) Register(c *gin.Context) {
 		return
 	}
 
-	_, err := ac.UserService.GetUserByEmail(&body.Email)
+	_, err := ac.userService.GetUserByEmail(&body.Email)
 	if err == nil {
 		dto.ApiResponse(c, http.StatusBadRequest, "User with e-mail `"+body.Email+"` already exists. Please login.")
 		return
 	}
 
-	user, err := ac.UserService.CreateUser(&body)
+	user, err := ac.userService.CreateUser(&body)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusBadGateway, "Unable to create user.")
 		return
@@ -51,7 +51,7 @@ func (ac *AuthController) Register(c *gin.Context) {
 		return
 	}
 
-	token, err := ac.TokenService.CreateToken(*user)
+	token, err := ac.tokenService.CreateToken(*user)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "Unable to generate authorization token.")
 		return
@@ -67,13 +67,13 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := ac.UserService.GetUserByEmail(&body.Email)
+	user, err := ac.userService.GetUserByEmail(&body.Email)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusNotFound, "User with e-mail `"+body.Email+"` not found.")
 		return
 	}
 
-	token, err := ac.TokenService.CreateToken(*user)
+	token, err := ac.tokenService.CreateToken(*user)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "Unable to generate authorization token.")
 		return

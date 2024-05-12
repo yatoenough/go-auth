@@ -19,7 +19,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	injector.Init()
+	injector.InitDependencies()
 
 	defer func() {
 		err := mongodb.Close()

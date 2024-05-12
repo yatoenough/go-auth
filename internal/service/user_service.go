@@ -14,28 +14,30 @@ import (
 
 type UserService interface {
 	CreateUser(*dto.CreateUserRequest) (*model.User, error)
-	ActivateUser(code *string) error
+
 	GetUserById(*string) (*model.User, error)
 	GetUserByCode(*string) (*model.User, error)
 	GetUserByEmail(*string) (*model.User, error)
 	GetAll() ([]model.User, error)
+
+	ActivateUser(code *string) error
 	UpdateUser(*model.User) error
 	DeleteUser(*string) error
 }
 
-type UserServiceImpl struct {
+type userServiceImpl struct {
 	userCollection *mongo.Collection
 	ctx            context.Context
 }
 
 func NewUserService(userCollection *mongo.Collection, ctx context.Context) UserService {
-	return &UserServiceImpl{
+	return &userServiceImpl{
 		userCollection: userCollection,
 		ctx:            ctx,
 	}
 }
 
-func (u *UserServiceImpl) CreateUser(body *dto.CreateUserRequest) (*model.User, error) {
+func (u *userServiceImpl) CreateUser(body *dto.CreateUserRequest) (*model.User, error) {
 	user := model.NewUser(body)
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -48,7 +50,7 @@ func (u *UserServiceImpl) CreateUser(body *dto.CreateUserRequest) (*model.User, 
 	return &user, err
 }
 
-func (u *UserServiceImpl) GetUserById(id *string) (*model.User, error) {
+func (u *userServiceImpl) GetUserById(id *string) (*model.User, error) {
 	var user *model.User
 	_id, _ := primitive.ObjectIDFromHex(*id)
 	query := bson.D{bson.E{Key: "_id", Value: _id}}
@@ -56,21 +58,21 @@ func (u *UserServiceImpl) GetUserById(id *string) (*model.User, error) {
 	return user, err
 }
 
-func (u *UserServiceImpl) GetUserByCode(code *string) (*model.User, error) {
+func (u *userServiceImpl) GetUserByCode(code *string) (*model.User, error) {
 	var user *model.User
 	query := bson.D{bson.E{Key: "activationCode", Value: code}}
 	err := u.userCollection.FindOne(u.ctx, query).Decode(&user)
 	return user, err
 }
 
-func (u *UserServiceImpl) GetUserByEmail(email *string) (*model.User, error) {
+func (u *userServiceImpl) GetUserByEmail(email *string) (*model.User, error) {
 	var user *model.User
 	query := bson.D{bson.E{Key: "email", Value: email}}
 	err := u.userCollection.FindOne(u.ctx, query).Decode(&user)
 	return user, err
 }
 
-func (u *UserServiceImpl) GetAll() ([]model.User, error) {
+func (u *userServiceImpl) GetAll() ([]model.User, error) {
 	cursor, err := u.userCollection.Find(u.ctx, bson.M{})
 	users := []model.User{}
 	if err != nil {
@@ -81,11 +83,11 @@ func (u *UserServiceImpl) GetAll() ([]model.User, error) {
 	return users, err
 }
 
-func (u *UserServiceImpl) UpdateUser(*model.User) error {
+func (u *userServiceImpl) UpdateUser(*model.User) error {
 	return nil
 }
 
-func (u *UserServiceImpl) ActivateUser(code *string) error {
+func (u *userServiceImpl) ActivateUser(code *string) error {
 	filter := bson.D{bson.E{Key: "activationCode", Value: code}}
 	update := bson.D{bson.E{Key: "$set", Value: bson.M{"isActivated": true}}}
 	result, _ := u.userCollection.UpdateOne(u.ctx, filter, update)
@@ -96,7 +98,7 @@ func (u *UserServiceImpl) ActivateUser(code *string) error {
 	return nil
 }
 
-func (u *UserServiceImpl) DeleteUser(id *string) error {
+func (u *userServiceImpl) DeleteUser(id *string) error {
 	_id, _ := primitive.ObjectIDFromHex(*id)
 	filter := bson.D{bson.E{Key: "_id", Value: _id}}
 	result, _ := u.userCollection.DeleteOne(u.ctx, filter)
