@@ -9,39 +9,56 @@ import (
 )
 
 type TokenService interface {
-	CreateToken(model.User) (string, error)
+	GenerateTokens(model.User) (map[string]string, error)
 	VerifyToken(tokenString string) (*jwt.Token, error)
 }
 
 type tokenServiceImpl struct {
-	secretKey []byte
+	accessSecretKey  []byte
+	refreshSecretKey []byte
 }
 
-func NewTokenService(secret string) TokenService {
+func NewTokenService(accessSecret, refreshSecret string) TokenService {
 	return &tokenServiceImpl{
-		secretKey: []byte(secret),
+		accessSecretKey:  []byte(accessSecret),
+		refreshSecretKey: []byte(refreshSecret),
 	}
 }
 
-func (ts *tokenServiceImpl) CreateToken(user model.User) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+func (ts *tokenServiceImpl) GenerateTokens(user model.User) (map[string]string, error) {
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"sub":   user.Id,
 			"email": user.Email,
-			"exp":   time.Now().Add(time.Hour * 2).Unix(),
+			"exp":   time.Now().Add(time.Minute * 30).Unix(),
 		})
 
-	tokenString, err := token.SignedString(ts.secretKey)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"sub":   user.Id,
+			"email": user.Email,
+			"exp":   time.Now().Add(time.Hour * 24 * 30).Unix(),
+		})
+
+	accessTokenString, err := accessToken.SignedString(ts.accessSecretKey)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return tokenString, nil
+	refreshTokenString, err := refreshToken.SignedString(ts.accessSecretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]string{
+		"access_token":  accessTokenString,
+		"refresh_token": refreshTokenString,
+	}, nil
 }
 
 func (ts *tokenServiceImpl) VerifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return ts.secretKey, nil
+		return ts.accessSecretKey, nil
 	})
 
 	if err != nil {

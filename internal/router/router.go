@@ -14,13 +14,17 @@ var router = gin.Default()
 
 func Run(port string) {
 	registerRoutes()
-	router.NoRoute(func(c *gin.Context) {
-		dto.ApiResponse(c, http.StatusNotFound, "Resource not found.")
-	})
-	router.Run(fmt.Sprintf(":%s", port))
+
+	err := router.Run(fmt.Sprintf(":%s", port))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func registerRoutes() {
+	router.NoRoute(func(c *gin.Context) {
+		dto.ApiResponse(c, http.StatusNotFound, "Resource not found.")
+	})
 	router.GET("/activate/:code", injector.UserController.ActivateUser)
 
 	v1 := router.Group("/api/v1")

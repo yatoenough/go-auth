@@ -1,5 +1,5 @@
 <h1 align="center">Go Auth API</h1>
-This project implements a Authentication built with Go and Gin Framework.
+This project implements an Authentication built with Go and Gin Framework.
 
 <h2>Features</h2>
 

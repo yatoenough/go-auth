@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"go-auth/internal/common/utils"
+	"errors"
 	"go-auth/internal/model/dto"
 	"go-auth/internal/service"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -25,7 +26,7 @@ func NewAuthMiddleware(tokenService service.TokenService) AuthMiddleware {
 }
 
 func (am *authMiddlewareImpl) Guard(c *gin.Context) {
-	jwtToken, err := utils.ExtractBearerToken(c.GetHeader("Authorization"))
+	jwtToken, err := am.extractBearerToken(c.GetHeader("Authorization"))
 	if err != nil {
 		dto.ApiResponse(c, http.StatusUnauthorized, err.Error())
 		c.Abort()
@@ -48,4 +49,17 @@ func (am *authMiddlewareImpl) Guard(c *gin.Context) {
 
 	c.Set("token_data", claims)
 	c.Next()
+}
+
+func (am *authMiddlewareImpl) extractBearerToken(header string) (string, error) {
+	if header == "" {
+		return "", errors.New("bad header value given")
+	}
+
+	jwtToken := strings.Split(header, " ")
+	if len(jwtToken) != 2 {
+		return "", errors.New("incorrectly formatted authorization header")
+	}
+
+	return jwtToken[1], nil
 }

@@ -21,7 +21,7 @@ func NewUserController(userService service.UserService) UserController {
 func (uc *UserController) ActivateUser(c *gin.Context) {
 	code := c.Param("code")
 
-	user, err := uc.userService.GetUserByCode(&code)
+	user, err := uc.userService.GetUserByCode((&code))
 	if err != nil {
 		dto.ApiResponse(c, http.StatusNotFound, "User not found.")
 		return
@@ -39,7 +39,7 @@ func (uc *UserController) ActivateUser(c *gin.Context) {
 
 func (uc *UserController) GetUserById(c *gin.Context) {
 	id := c.Param("id")
-	user, err := uc.userService.GetUserById((&id))
+	user, err := uc.userService.GetUserById(&id)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusNotFound, "User not found.")
 		return

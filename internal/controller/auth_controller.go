@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"go-auth/internal/common/utils"
 	"go-auth/internal/model/dto"
 	"go-auth/internal/service"
 	"net/http"
@@ -13,12 +12,18 @@ import (
 type AuthController struct {
 	userService  service.UserService
 	tokenService service.TokenService
+	mailService  service.MailService
 }
 
-func NewAuthController(userService service.UserService, tokenService service.TokenService) AuthController {
+func NewAuthController(
+	userService service.UserService,
+	tokenService service.TokenService,
+	mailService service.MailService,
+) AuthController {
 	return AuthController{
 		userService:  userService,
 		tokenService: tokenService,
+		mailService:  mailService,
 	}
 }
 
@@ -45,19 +50,20 @@ func (ac *AuthController) Register(c *gin.Context) {
 	activationLink := apiHost + "/activate/" + user.ActivationCode
 	msgBody := "Activate your account by following this link: " + activationLink
 
-	err = utils.SendMail(user.Email, msgBody)
+	err = ac.mailService.SendActivationMail(user.Email, msgBody)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "Unable to send mail.")
 		return
 	}
 
-	token, err := ac.tokenService.CreateToken(*user)
+	tokens, err := ac.tokenService.GenerateTokens(*user)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "Unable to generate authorization token.")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"accessToken": token})
+	c.SetCookie("refresh_token", tokens["refresh_token"], 3600, "/", "localhost", false, true)
+	c.JSON(http.StatusOK, gin.H{"accessToken": tokens["access_token"]})
 }
 
 func (ac *AuthController) Login(c *gin.Context) {
@@ -73,11 +79,12 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := ac.tokenService.CreateToken(*user)
+	tokens, err := ac.tokenService.GenerateTokens(*user)
 	if err != nil {
 		dto.ApiResponse(c, http.StatusInternalServerError, "Unable to generate authorization token.")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"accessToken": token})
+	c.SetCookie("refresh_token", tokens["refresh_token"], 3600, "/", "localhost", false, true)
+	c.JSON(http.StatusOK, gin.H{"accessToken": tokens["access_token"]})
 }
