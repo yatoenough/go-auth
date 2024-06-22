@@ -57,10 +57,6 @@ func (uc *UserController) GetAll(c *gin.Context) {
 
 }
 
-func (uc *UserController) UpdateUser(c *gin.Context) {
-
-}
-
 func (uc *UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	err := uc.userService.DeleteUser(&id)

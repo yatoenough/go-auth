@@ -21,7 +21,6 @@ type UserService interface {
 	GetAll() ([]model.User, error)
 
 	ActivateUser(code *string) error
-	UpdateUser(*model.User) error
 	DeleteUser(*string) error
 }
 
@@ -81,10 +80,6 @@ func (u *userServiceImpl) GetAll() ([]model.User, error) {
 	err = cursor.All(u.ctx, &users)
 
 	return users, err
-}
-
-func (u *userServiceImpl) UpdateUser(*model.User) error {
-	return nil
 }
 
 func (u *userServiceImpl) ActivateUser(code *string) error {
