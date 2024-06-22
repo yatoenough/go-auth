@@ -9,7 +9,7 @@ import (
 
 // define user model
 type User struct {
-	Id             primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Id             primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty" `
 	Email          string             `bson:"email" json:"email"`
 	Password       string             `bson:"password" json:"-"`
 	IsActivated    bool               `bson:"isActivated" json:"isActivated"`

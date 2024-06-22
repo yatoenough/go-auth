@@ -49,7 +49,6 @@ func (ts *tokenServiceImpl) GenerateTokens(user model.User) (map[string]string, 
 	if err != nil {
 		return nil, err
 	}
-
 	return map[string]string{
 		"access_token":  accessTokenString,
 		"refresh_token": refreshTokenString,

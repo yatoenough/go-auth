@@ -5,8 +5,13 @@ import (
 	"go-auth/internal/service"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
+	enTranslations "github.com/go-playground/validator/v10/translations/en"
 )
 
 type AuthController struct {
@@ -30,11 +35,24 @@ func NewAuthController(
 func (ac *AuthController) Register(c *gin.Context) {
 	var body dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
-		dto.ApiResponse(c, http.StatusBadRequest, "Bad request.")
+		dto.ApiResponse(c, http.StatusBadRequest, "Invalid JSON.")
 		return
 	}
 
-	_, err := ac.userService.GetUserByEmail(&body.Email)
+	validate := validator.New()
+	english := en.New()
+	uni := ut.New(english, english)
+	trans, _ := uni.GetTranslator("en")
+	enTranslations.RegisterDefaultTranslations(validate, trans)
+
+	err := validate.Struct(body)
+	if err != nil {
+		errs := err.(validator.ValidationErrors)
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "errors": errs.Translate(trans), "timestamp": time.Now()})
+		return
+	}
+
+	_, err = ac.userService.GetUserByEmail(&body.Email)
 	if err == nil {
 		dto.ApiResponse(c, http.StatusBadRequest, "User with e-mail `"+body.Email+"` already exists. Please login.")
 		return
@@ -69,7 +87,20 @@ func (ac *AuthController) Register(c *gin.Context) {
 func (ac *AuthController) Login(c *gin.Context) {
 	var body dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
-		dto.ApiResponse(c, http.StatusBadRequest, "Bad request.")
+		dto.ApiResponse(c, http.StatusBadRequest, "Invalid JSON.")
+		return
+	}
+
+	validate := validator.New()
+	english := en.New()
+	uni := ut.New(english, english)
+	trans, _ := uni.GetTranslator("en")
+	enTranslations.RegisterDefaultTranslations(validate, trans)
+
+	err := validate.Struct(body)
+	if err != nil {
+		errs := err.(validator.ValidationErrors)
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "errors": errs.Translate(trans), "timestamp": time.Now()})
 		return
 	}
 
